@@ -3,12 +3,40 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
     const [mostrarSenha, setMostrarSenha] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState("");
+    const router = useRouter();
+
+    async function entrar(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        setLoading(true);
+        setMessage("");
+
+        const form = new FormData(e.currentTarget);
+        try {
+            const resposta = await fetch("/api/session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: form.get("email"), senha: form.get("senha") }),
+            });
+            if (!resposta.ok) {
+                const erro = await resposta.json().catch(() => ({}));
+                throw new Error(erro.message || "Não foi possível entrar.");
+            }
+            router.push("/");
+            router.refresh();
+        } catch (error) {
+            setMessage(error instanceof Error ? error.message : "Não foi possível entrar.");
+            setLoading(false);
+        }
+    }
 
     return (
-        <main className="min-h-screen flex flex-col lg:flex-row bg-[#f5f5e8]">
+        <main className="min-h-[calc(100vh-92px)] flex flex-col lg:flex-row bg-[#f5f5e8]">
             <div className="bg-[#f5f5e8] text-black w-full lg:w-1/2 flex flex-col items-center justify-between px-6 pt-10 lg:pt-14">
                 <Image src="/img_1.png" alt="Logo Stock.io" width={842} height={444} className="w-full max-w-md h-auto" priority />
                 <Image
@@ -25,7 +53,7 @@ export default function Login() {
                 <div className="w-full max-w-xl mx-auto">
                     <h1 className="text-center font-extrabold text-3xl sm:text-4xl lg:text-[44.42px] leading-none uppercase mb-10">Bem-vindo de volta!</h1>
 
-                    <form>
+                    <form onSubmit={entrar}>
                         <label className="sr-only" htmlFor="email">Email</label>
                         <input className="rounded-full px-7 py-3 bg-[#f5f5e8] block w-full text-black placeholder:text-zinc-500" id="email" name="email" type="email" placeholder="Email" required />
 
@@ -48,7 +76,9 @@ export default function Login() {
 
                         <p className="mt-5 text-center cursor-pointer underline">Esqueceu sua senha?</p>
 
-                        <button className="bg-[#6A38F3] rounded-full cursor-pointer h-[52px] font-semibold text-[25.38px] leading-none mt-8 block w-full" type="button">ENTRAR</button>
+                        {message && <p role="alert" className="mt-5 text-center text-[#f7a1b8]">{message}</p>}
+
+                        <button className="bg-[#6A38F3] rounded-full cursor-pointer h-[52px] font-semibold text-[25.38px] leading-none mt-8 block w-full disabled:opacity-50" type="submit" disabled={loading}>{loading ? "ENTRANDO..." : "ENTRAR"}</button>
                     </form>
 
                     <p className="mt-7 text-left text-lg">Não possui uma conta? <Link className="text-[#6A38F3] font-semibold" href="/cadastro">Cadastre-se</Link></p>
