@@ -9,6 +9,7 @@ export default function Login() {
     const [mostrarSenha, setMostrarSenha] = useState(false);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [loginFeito, setLoginFeito] = useState(false);
     const router = useRouter();
 
     async function entrar(e: React.FormEvent<HTMLFormElement>) {
@@ -27,7 +28,9 @@ export default function Login() {
                 const erro = await resposta.json().catch(() => ({}));
                 throw new Error(erro.message || "Não foi possível entrar.");
             }
-            router.push("/");
+            setLoginFeito(true);
+            await new Promise((resolve) => window.setTimeout(resolve, 1800));
+            router.push("/categoria");
             router.refresh();
         } catch (error) {
             setMessage(error instanceof Error ? error.message : "Não foi possível entrar.");
@@ -37,6 +40,13 @@ export default function Login() {
 
     return (
         <main className="min-h-[calc(100vh-92px)] flex flex-col lg:flex-row bg-[#f5f5e8]">
+            {loginFeito && (
+                <div role="status" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+                    <div className="rounded-2xl border border-[#C6E700] bg-[#151917] px-8 py-6 text-center text-xl font-semibold text-[#F6F3E4] shadow-lg">
+                        Login efetuado com sucesso!
+                    </div>
+                </div>
+            )}
             <div className="bg-[#f5f5e8] text-black w-full lg:w-1/2 flex flex-col items-center justify-between px-6 pt-10 lg:pt-14">
                 <Image src="/img_1.png" alt="Logo Stock.io" width={842} height={444} className="w-full max-w-md h-auto" priority />
                 <Image
@@ -78,7 +88,7 @@ export default function Login() {
 
                         {message && <p role="alert" className="mt-5 text-center text-[#f7a1b8]">{message}</p>}
 
-                        <button className="bg-[#6A38F3] rounded-full cursor-pointer h-[52px] font-semibold text-[25.38px] leading-none mt-8 block w-full disabled:opacity-50" type="submit" disabled={loading}>{loading ? "ENTRANDO..." : "ENTRAR"}</button>
+                        <button className="bg-[#6A38F3] rounded-full cursor-pointer h-[52px] font-semibold text-[25.38px] leading-none mt-8 block w-full disabled:opacity-50" type="submit" disabled={loading}>{loginFeito ? "REDIRECIONANDO..." : loading ? "ENTRANDO..." : "ENTRAR"}</button>
                     </form>
 
                     <p className="mt-7 text-left text-lg">Não possui uma conta? <Link className="text-[#6A38F3] font-semibold" href="/cadastro">Cadastre-se</Link></p>
