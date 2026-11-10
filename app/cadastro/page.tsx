@@ -75,7 +75,7 @@ export default function Cadastro() {
       }
 
       setMessage("Conta criada. Faça login para entrar.");
-    } catch (error: any) {
+    } catch (error) {
       if (error instanceof TypeError) {
         setMessage(
           "Não foi possível conectar ao servidor. Verifique se o backend está rodando."
