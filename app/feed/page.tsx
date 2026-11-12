@@ -166,8 +166,8 @@ export default function FeedPage() {
       
       <section className="bg-black text-[#F7F4E8] px-1 pt-1 rounded-b-[35px] relative overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between mt-1 mb-4 px-1">
-          <div className="max-w-7xl mx-auto w-full flex items-end justify-center h-full relative">
-            <div className="relative w-full h-[350px] md:h-[650px] -mb-40">
+          <div className="max-w-7xl mx-auto w-full flex items-start justify-center h-[410px] relative">
+            <div className="relative w-full h-[350px] md:h-[700px] -mb-40">
               <Image
                 src="/feed-completo.png"
                 alt="Mascote Stock.io"
