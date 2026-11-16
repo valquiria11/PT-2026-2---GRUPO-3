@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { Search, ShoppingBag, Store, ChevronDown } from "lucide-react";
 import CartaoProduto from "../components/CartaoProduto";
+import RolagemProdutos from "../components/setaRolarProdutos";
+import RolagemHorizontal from "../components/setaRolarProdutos";
 
 
 const CATEGORIAS = [
@@ -163,7 +165,6 @@ const LOJAS = [
 export default function FeedPage() {
   return (
     <main className="min-h-screen bg-[#F7F4E8] overflow-x-hidden">
-      
       <section className="bg-black text-[#F7F4E8] px-1 pt-1 rounded-b-[35px] relative overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between mt-1 mb-4 px-1">
           <div className="max-w-7xl mx-auto w-full flex items-start justify-center h-[410px] relative">
@@ -196,8 +197,8 @@ export default function FeedPage() {
 
         {/* categorias */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-[#171918] mb-6">Categoria</h2>
-          <div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-none -mr-6 pr-6">
+          <h2 className="text-2xl font-bold text-[#171918] mb-4">Categoria</h2>
+          <div className="flex items-center gap-4 overflow-x-auto py-3 px-2 scrollbar-none -mr-6 pr-6">
             {CATEGORIAS.map((cat) => (
               <div
                 key={cat.id}
@@ -221,11 +222,11 @@ export default function FeedPage() {
             </button>
           </div>
 
-          <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-none -mr-6 pr-6">
+          <RolagemHorizontal className="gap-5 pb-4">
             {PRODUTOS_MERCADO.map((prod) => (
               <CartaoProduto key={prod.id} {...prod} />
             ))}
-          </div>
+          </RolagemHorizontal>
         </section>
 
         {/* beleza */}
@@ -239,11 +240,11 @@ export default function FeedPage() {
             </button>
           </div>
 
-          <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-none -mr-6 pr-6">
+          <RolagemHorizontal className="gap-5 pb-4">
             {PRODUTOS_BELEZA.map((prod) => (
               <CartaoProduto key={prod.id} {...prod} />
             ))}
-          </div>
+          </RolagemHorizontal>
         </section>
 
         {/* moda */}
@@ -257,11 +258,11 @@ export default function FeedPage() {
             </button>
           </div>
 
-          <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-none -mr-6 pr-6">
+          <RolagemHorizontal className="gap-5 pb-4">
             {PRODUTOS_MODA.map((prod) => (
               <CartaoProduto key={prod.id} {...prod} />
             ))}
-          </div>
+          </RolagemHorizontal>
         </section>
 
         {/* lojas */}
@@ -279,8 +280,8 @@ export default function FeedPage() {
             </div>
           </div>
 
-          {/* imagens loja */}
-          <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-none -mr-6 pr-6">
+          {/* imagens loja com setas dinâmicas */}
+          <RolagemHorizontal className="gap-6 py-4 px-2">
             {LOJAS.map((loja) => (
               <div key={loja.id} className="flex flex-col items-center min-w-[110px] shrink-0">
                 <div className="relative w-36 h-36 rounded-full overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer hover:scale-105 transition-transform">
@@ -299,7 +300,7 @@ export default function FeedPage() {
                 </span>
               </div>
             ))}
-          </div>
+          </RolagemHorizontal>
         </section>
       </div>
     </main>
