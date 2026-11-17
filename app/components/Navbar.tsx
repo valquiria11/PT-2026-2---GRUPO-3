@@ -32,7 +32,7 @@ export default function Navbar({ logado = false }: { logado?: boolean }) {
           <span className={iconClass} role="img" aria-label="Loja"><Icon name="store" /></span>
           {logado ? (
             <>
-              <span className={iconClass} role="img" aria-label="Perfil"><Icon name="user" /></span>
+              <Link href="/perfil"  className={iconClass}  aria-label="Perfil">  <Icon name="user" /></Link>
               <LogoutButton className={`${iconClass} hover:text-[#C40955] focus-visible:text-[#C40955]`}><Icon name="logout" /></LogoutButton>
             </>
           ) : (
