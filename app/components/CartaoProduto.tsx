@@ -10,6 +10,7 @@ export interface ProdutoProps {
   disponivel: boolean;
   imagemUrl: string;
   lojaUrl?: string;
+  lojaSeloUrl?: string;
   nomeLoja?: string;
 }
 
@@ -19,17 +20,19 @@ export default function CartaoProduto({
   unidade,
   disponivel,
   imagemUrl,
-  lojaUrl: lojaUrl,
+  lojaUrl,
+  lojaSeloUrl,
   nomeLoja,
 }: ProdutoProps) {
+  const logo = lojaUrl ?? lojaSeloUrl;
   return (
     <div className="bg-white rounded-[28px] p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative min-w-[220px] max-w-[240px] h-[310px] shrink-0">
       
       {/* loja redondinha no topo do produto */}
-      {lojaUrl && (
+      {logo && (
         <div className="absolute top-3 right-3 z-20 w-10 h-10 rounded-full overflow-hidden border border-gray-100 shadow-md bg-white">
           <Image
-            src={lojaUrl}
+            src={logo}
             alt={nomeLoja || "Logo da Loja"}
             fill
             className="object-cover"
@@ -39,12 +42,17 @@ export default function CartaoProduto({
 
       {/* foto do produto */}
       <div className="relative w-full h-36 mt-2 flex items-center justify-center">
-        <Image
-          src={imagemUrl}
-          alt={nome}
-          fill
-          className="object-contain p-2"
-        />
+        {imagemUrl ? (
+          <Image
+            src={imagemUrl}
+            alt={nome}
+            fill
+            unoptimized
+            className="object-contain p-2"
+          />
+        ) : (
+          <span className="text-sm text-gray-500">Sem imagem</span>
+        )}
       </div>
 
       {/* info do produto */}

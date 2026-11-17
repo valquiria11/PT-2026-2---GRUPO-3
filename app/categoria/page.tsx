@@ -3,109 +3,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-type  Produtos = {
-  id: number;
-  loja_id: number;
-  categoria_id: number;
-  nome: string;
-  descricao?: string | null;
-  preco: number;
-  stock: number;
-  createdAt: string;
-  updatedAt?: string;
-}
-
-const produtos: Produtos[] = [
-  {
-    id: 1,
-    nome: "Comp. Lenovo",
-    loja_id: 1,
-    categoria_id: 3,
-    preco: 3200,
-    stock: 10,
-    createdAt: "2023-01-01T00:00:00Z",
-  },
-  {
-    id: 2,
-    nome: "Comp. Samsung",
-    loja_id: 2,
-    categoria_id: 3,
-    preco: 4500,
-    stock: 0,
-    createdAt: "2023-01-01T00:00:00Z",
-  },
-  {
-    id: 3,
-    nome: "iPhone 15",
-    loja_id: 3,
-    categoria_id: 2,
-    preco: 3900,
-    stock: 8,
-    createdAt: "2023-01-01T00:00:00Z",
-  },
-  {
-    id: 4,
-    nome: "Smart TV Philips",
-    loja_id: 4,
-    categoria_id: 4,
-    preco: 2800,
-    stock: 15,
-    createdAt: "2023-01-01T00:00:00Z",
-  },
-  {
-    id: 5,
-    nome: "Xbox Series X",
-    loja_id: 5,
-    categoria_id: 6,
-    preco: 4200,
-    stock: 5,
-    createdAt: "2023-01-01T00:00:00Z",
-  },
-  { 
-    id: 6, 
-    nome: "Headset Gamer", 
-    loja_id: 7, 
-    categoria_id: 5, 
-    preco: 899.99, 
-    stock: 0, 
-    createdAt: "2023-02-01T00:00:00Z" 
-  },
-  { 
-    id: 7, 
-    nome: "Micro SD", 
-    loja_id: 1, 
-    categoria_id: 5, 
-    preco: 179.9, 
-    stock: 20, 
-    createdAt: "2024-05-05T00:00:00Z" 
-  },
-  { id: 8, 
-    nome: "Playstation 5", 
-    loja_id: 7, 
-    categoria_id: 6, 
-    preco: 4992.98, 
-    stock: 4, 
-    createdAt: "2024-05-04T00:00:00Z" 
-  },
-  { 
-    id: 9, 
-    nome: "Iphone 4", 
-    loja_id: 2, 
-    categoria_id: 2, 
-    preco: 469.99, 
-    stock: 3, 
-    createdAt: "2024-05-02T00:00:00Z"
-   },
-  { id: 10, 
-    nome: "Nintendo 3DS", 
-    loja_id: 7, 
-    categoria_id: 6, 
-    preco: 2089.99, 
-    stock: 0, 
-    createdAt: "2024-05-01T00:00:00Z" 
-  },
-];
+import { useProducts } from "../hooks/useProducts";
+import { imagemProduto, type Produto } from "../lib/products";
 
 type Categorias = {
   id: number;
@@ -233,18 +132,7 @@ const lojas: Lojas[] = [
   },
 ];
 
-const lojaPorId = new Map(lojas.map((l) => [l.id, l]));
-
 const categoriaPorId = new Map(categorias.map((c) => [c.id, c.nome]));
-
-const populares = produtos.filter((p) => [1, 2, 4, 5, 6].includes(p.id));
-
-const recentes = [...produtos]
-  .sort(
-    (a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
-  .slice(0, 8);
 
 const itens_por_pagina = 15; // 5 colunas x 3 linhas
 
@@ -257,14 +145,18 @@ const formatPreco = (preco: number) =>
 const filtros = categorias.filter((c) => c.categoria_principal_id != null);
 
 export default function CategoriaPage() {
-    const [categoriaAtiva, setCategoriaAtiva] = useState<number | null>(null);
+    const [categoriaAtiva, setCategoriaAtiva] = useState<string | null>(null);
     const [ordem, setOrdem] = useState<string>("default");
     const [busca, setBusca] = useState("");
     const [pagina, setPagina] = useState(1);
+    const { produtos, carregando, erro } = useProducts(busca);
+    const populares = produtos.slice(0, 5);
+    const recentes = [...produtos]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 8);
 
     const produtosFiltrados = produtos
-      .filter((p) => p.nome.toLowerCase().includes(busca.toLowerCase()))
-      .filter((p) => categoriaAtiva === null || p.categoria_id === categoriaAtiva)
+      .filter((p) => categoriaAtiva === null || p.categoria.nome === categoriaAtiva)
       .sort((a, b) => {
         if (ordem === "menor") return a.preco - b.preco;
         if (ordem === "maior") return b.preco - a.preco;
@@ -353,12 +245,12 @@ export default function CategoriaPage() {
         <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-3 lg:gap-[25px]">
             {filtros.map((cat) => {
-              const ativa = categoriaAtiva === cat.id;
+              const ativa = categoriaAtiva === cat.nome;
               return (
                 <button
                   key={cat.id}
                   type="button"
-                  onClick={() => { setCategoriaAtiva(ativa ? null : cat.id); setPagina(1); }}
+                  onClick={() => { setCategoriaAtiva(ativa ? null : cat.nome); setPagina(1); }}
                   className={`cursor-pointer rounded-full px-5 py-2 text-base transition-colors lg:h-[37px] lg:w-[121px] lg:px-0 lg:py-0 ${
                     ativa
                       ? "bg-[#6A38F3] text-white"
@@ -410,7 +302,9 @@ export default function CategoriaPage() {
           ))}
         </div>
 
-        {produtosFiltrados.length === 0 && (
+        {carregando && <p role="status" className="mt-10 text-center text-lg">Buscando produtos...</p>}
+        {erro && <p role="alert" className="mt-10 text-center text-lg text-[#C4002B]">{erro}</p>}
+        {!carregando && !erro && produtosFiltrados.length === 0 && (
           <p className="mt-10 text-center text-lg text-zinc-500">
             Nenhum produto encontrado. Tente outra busca ou outro filtro.
           </p>
@@ -524,29 +418,29 @@ function CardProduto({
   produto,
   className = "",
 }: {
-  produto: Produtos;
+  produto: Produto;
   className?: string;
 }) {
   const disponivel = produto.stock > 0;
-  const loja = lojaPorId.get(produto.loja_id);
+  const loja = produto.loja;
+  const imagem = imagemProduto(produto);
 
   return (
     <article
       className={`relative flex h-[311px] flex-col overflow-hidden rounded-[40px] bg-white p-[22px] text-black ${className}`}
     >
       <div className="relative h-[170px] w-full">
-        <Image
-          src={`/produtos/${produto.id}.png`}
-          alt={produto.nome}
-          fill
-          className="object-contain"
-        />
+        {imagem ? (
+          <Image src={imagem} alt={produto.nome} fill unoptimized className="object-contain" />
+        ) : (
+          <span className="flex h-full items-center justify-center text-sm text-zinc-500">Sem imagem</span>
+        )}
       </div>
 
-      {loja?.sticker_url && (
+      {loja.logo_url && (
          <div className="absolute right-4 top-4 z-10 h-[68px] w-[68px] overflow-hidden rounded-full">
            <Image
-             src={loja.sticker_url}
+             src={loja.logo_url}
              alt={`Logo ${loja.nome}`}
              fill
              className="object-cover"
@@ -579,7 +473,7 @@ function CarrosselProdutos({
 }: {
   titulo: string;
   href: string;
-  itens: Produtos[];
+  itens: Produto[];
   className?: string;
 }) {
   return (

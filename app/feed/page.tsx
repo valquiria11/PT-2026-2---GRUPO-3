@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { Search, ShoppingBag, Store, ChevronDown } from "lucide-react";
+import { useState } from "react";
 import CartaoProduto from "../components/CartaoProduto";
-import RolagemProdutos from "../components/setaRolarProdutos";
-import RolagemHorizontal from "../components/setaRolarProdutos";
+import { useProducts } from "../hooks/useProducts";
+import { imagemProduto } from "../lib/products";
 
 
 const CATEGORIAS = [
@@ -163,8 +163,12 @@ const LOJAS = [
 ];
 
 export default function FeedPage() {
+  const [busca, setBusca] = useState("");
+  const { produtos, carregando, erro } = useProducts(busca, busca.trim().length > 0);
+
   return (
     <main className="min-h-screen bg-[#F7F4E8] overflow-x-hidden">
+      
       <section className="bg-black text-[#F7F4E8] px-1 pt-1 rounded-b-[35px] relative overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between mt-1 mb-4 px-1">
           <div className="max-w-7xl mx-auto w-full flex items-start justify-center h-[410px] relative">
@@ -189,16 +193,48 @@ export default function FeedPage() {
             <input
               type="text"
               placeholder="Procurar por..."
+              value={busca}
+              onChange={(event) => setBusca(event.target.value)}
+              aria-label="Procurar produtos"
               className="w-full bg-white text-gray-800 rounded-full py-3.5 px-6 pr-12 text-sm shadow-sm outline-none border border-transparent focus:border-[#6735E8]"
             />
-            <Search className="w-5 h-5 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2" />
+            <svg className="w-5 h-5 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m16 16 5 5" />
+            </svg>
           </div>
         </div>
 
+        {busca.trim() ? (
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-[#171918] mb-6">Resultados da busca</h2>
+            {carregando && <p role="status">Buscando produtos...</p>}
+            {erro && <p role="alert" className="text-[#C4002B]">{erro}</p>}
+            {!carregando && !erro && produtos.length === 0 && <p>Nenhum produto encontrado.</p>}
+            {!carregando && !erro && (
+              <div className="flex gap-5 overflow-x-auto pb-4">
+                {produtos.map((produto) => (
+                  <CartaoProduto
+                    key={produto.id}
+                    id={produto.id}
+                    nome={produto.nome}
+                    preco={produto.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                    disponivel={produto.stock > 0}
+                    imagemUrl={imagemProduto(produto) ?? ""}
+                    lojaUrl={produto.loja.logo_url ?? undefined}
+                    nomeLoja={produto.loja.nome}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        ) : (
+          <>
+
         {/* categorias */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-[#171918] mb-4">Categoria</h2>
-          <div className="flex items-center gap-4 overflow-x-auto py-3 px-2 scrollbar-none -mr-6 pr-6">
+          <h2 className="text-2xl font-bold text-[#171918] mb-6">Categoria</h2>
+          <div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-none -mr-6 pr-6">
             {CATEGORIAS.map((cat) => (
               <div
                 key={cat.id}
@@ -222,11 +258,11 @@ export default function FeedPage() {
             </button>
           </div>
 
-          <RolagemHorizontal className="gap-5 pb-4">
+          <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-none -mr-6 pr-6">
             {PRODUTOS_MERCADO.map((prod) => (
               <CartaoProduto key={prod.id} {...prod} />
             ))}
-          </RolagemHorizontal>
+          </div>
         </section>
 
         {/* beleza */}
@@ -240,11 +276,11 @@ export default function FeedPage() {
             </button>
           </div>
 
-          <RolagemHorizontal className="gap-5 pb-4">
+          <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-none -mr-6 pr-6">
             {PRODUTOS_BELEZA.map((prod) => (
               <CartaoProduto key={prod.id} {...prod} />
             ))}
-          </RolagemHorizontal>
+          </div>
         </section>
 
         {/* moda */}
@@ -258,11 +294,11 @@ export default function FeedPage() {
             </button>
           </div>
 
-          <RolagemHorizontal className="gap-5 pb-4">
+          <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-none -mr-6 pr-6">
             {PRODUTOS_MODA.map((prod) => (
               <CartaoProduto key={prod.id} {...prod} />
             ))}
-          </RolagemHorizontal>
+          </div>
         </section>
 
         {/* lojas */}
@@ -272,7 +308,9 @@ export default function FeedPage() {
             <div className="flex items-center gap-6">
               <div className="bg-white rounded-full px-5 py-2 flex items-center gap-4 shadow-sm text-sm text-gray-400 border border-gray-100 cursor-pointer">
                 <span>filtros</span>
-                <ChevronDown className="w-4 h-4" />
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
               </div>
               <button className="text-xs text-[#6735E8] font-bold hover:underline">
                 ver mais
@@ -280,8 +318,8 @@ export default function FeedPage() {
             </div>
           </div>
 
-          {/* imagens loja com setas dinâmicas */}
-          <RolagemHorizontal className="gap-6 py-4 px-2">
+          {/* imagens loja */}
+          <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-none -mr-6 pr-6">
             {LOJAS.map((loja) => (
               <div key={loja.id} className="flex flex-col items-center min-w-[110px] shrink-0">
                 <div className="relative w-36 h-36 rounded-full overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer hover:scale-105 transition-transform">
@@ -300,8 +338,10 @@ export default function FeedPage() {
                 </span>
               </div>
             ))}
-          </RolagemHorizontal>
+          </div>
         </section>
+          </>
+        )}
       </div>
     </main>
   );
