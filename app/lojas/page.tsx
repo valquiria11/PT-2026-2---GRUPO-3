@@ -7,11 +7,11 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { Medicine02Icon } from "@hugeicons/core-free-icons"
 import { PiDress } from "react-icons/pi";
 import { LuGamepad2 } from "react-icons/lu";
+import { CiSearch } from "react-icons/ci";
 import { Icon } from "@iconify/react"
 import CIcon from "@coreui/icons-react";
 import { cilLaptop, cilHome } from "@coreui/icons"
-import DollIcon from "./../../public/categorias/DollIcon"
-import icon from "lucide-react/icons/";
+import DollIcon from "./../../public/categorias/DollIcon" 
 
 type Lojas = {
     id: number;
@@ -41,11 +41,12 @@ const itens_pag = 15
 
 export default function Lojas() {
     const [lojas, setLojas] = useState<Lojas[]>();
-    const [busca, SetBusca] = useState("");
+    const [busca, setBusca] = useState("");
+    const [pagina, setPagina] = useState(1);
 
     return(
         <main className="min-h-screen bg-[#F6F3E4]">
-            {/*categorias*/}
+            {/*Categorias*/}
             <section className="relative bg-black w-full h-[358px] place-items-center">
                 <div className="absolute w-full px-[110px] py-[80px] flex flex-col gap-10">
                     <h2 className="text-3xl font-semibold text-[#F7F4E8]">Categoria</h2>
@@ -57,13 +58,38 @@ export default function Lojas() {
                             href={`/categoria/${cat.id}`}
                             className="group bg-white rounded-4xl min-w-[115px] h-[115px] flex flex-col items-center justify-center cursor-pointer"
                            >
-                            <span className="text-3xl text-[#6A38F3] group-hover:opacity-65 flex items-center justify-center">{cat.icone}</span>
-                            <span className="text-base font-semibold text-black group-hover:opacity-50">{cat.nome}</span>
+                            <span className="text-3xl text-[#6A38F3] group-hover:opacity-60 flex items-center justify-center">{cat.icone}</span>
+                            <span className="text-base font-semibold text-black group-hover:opacity-55">{cat.nome}</span>
                             
                         </Link>
                         ))}
                     </div>
                 </div>
+            </section>
+            
+            {/*Lojas*/}
+            <section className="relative w-full px-30">
+
+                {/*Busca*/}
+                <div className="flex justify-end py-5">
+                    <div className="w-[604px] h-[39px] flex items-center rounded-full bg-white flex justify-between px-8">
+                      <label className="sr-only" htmlFor="busca">
+                        Procurar produtos
+                      </label>
+                      <input
+                        id="busca"
+                        name="busca"
+                        type="text"
+                        value={busca}
+                        onChange={(e) => { setBusca(e.target.value); setPagina(1); }}
+                        placeholder="Procurar por..."
+                        className="w-[604px] text-base text-[#6A38F3] outline-none placeholder:text-[#B9A5FA]"
+                      />
+                      <CiSearch size={25} color="#6A38F3" className="opacity-60"/>
+                    </div>
+                </div>
+
+
             </section>
 
         </main>
