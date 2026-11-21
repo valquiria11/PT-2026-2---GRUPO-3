@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useProducts } from "../hooks/useProducts";
-import { imagemProduto, type Produto } from "../lib/products";
+import { useProducts } from "../../hooks/useProducts";
+import { imagemProduto, type Produto } from "../../lib/products";
 
 type Categorias = {
   id: number;
