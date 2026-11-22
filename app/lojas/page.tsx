@@ -13,7 +13,8 @@ import { CiSearch, CiFilter } from "react-icons/ci";
 import { Icon } from "@iconify/react"
 import CIcon from "@coreui/icons-react";
 import { cilLaptop, cilHome } from "@coreui/icons"
-import DollIcon from "./../../public/categorias/DollIcon" 
+import DollIcon from "./../../public/categorias/DollIcon"
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 type Lojas = {
     id: number;
@@ -193,6 +194,43 @@ export default function Lojas() {
                         </div>
                     ))}
                 </div>
+
+                {/*Paginação*/}
+                <nav className="flex items-center justify-center gap-6 text-4xl leading-none text-black">
+                    <button 
+                        type="button"
+                        aria-label="Página anterior"
+                        disabled={pagina === 1}
+                        onClick={() => setPagina(pagina - 1)}
+                        className="cursor-pointer disabled:cursor-default disabled:opacity-30"
+                    >
+                    <MdKeyboardArrowLeft size={60}/>
+                    </button>
+
+                    {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(
+                        (numero) => (
+                            <button
+                                key={numero}
+                                type="button"
+                                onClick={() => setPagina(numero)}
+                                className={`w-10 h-10 rounded-full cursor-pointer
+                                    ${pagina === numero? "bg-[#6A38F3] text-white" : "bg-white text-[#6A38F3]"} `}
+                            >
+                                {numero}
+                            </button>
+                        )
+                    )}
+
+                  <button
+                    type="button"
+                    aria-label="Próxima página"
+                    disabled={pagina === totalPaginas}
+                    onClick={() => setPagina(pagina + 1)}
+                    className="cursor-pointer disabled:cursor-default disabled:opacity-30"
+                  >
+                    <MdKeyboardArrowRight size={60}/>
+                  </button>
+                </nav>
             </section>
         </main>
     )
