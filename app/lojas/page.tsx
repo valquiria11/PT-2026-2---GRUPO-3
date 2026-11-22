@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link";
+import Image from "next/image";
 import api from "../services/api"
 import { Vegetables } from "@healthicons/react"
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -169,7 +170,29 @@ export default function Lojas() {
                         </div>
                 </div>
 
-                
+                {/*Grid das lojas*/}
+                <div className="grid items-center justify-center grid-cols-5">
+                    {lojasPaginadas.map((loja) => (
+                        <div key={loja.id} className="flex flex-col items-center min-w-0">
+                            <div className="relative w-36 h-36 rounded-full overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer hover:scale-105 transition-transform">
+                                {loja.logo_url && (
+                                    <Image
+                                      src={loja.logo_url}
+                                      alt={loja.nome}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                )}
+                            </div>
+                            <span className="text-sm font-bold text-[#171918] mt-2 text-center">
+                              {loja.nome}
+                            </span>
+                            <span className="text-xs text-[#6735E8] capitalize">
+                              {Categorias.find((categoria) => categoria.id === loja.categoria_id)?.nome}
+                            </span>
+                        </div>
+                    ))}
+                </div>
             </section>
         </main>
     )
