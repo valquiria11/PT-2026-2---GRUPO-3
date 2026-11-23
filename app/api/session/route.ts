@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
   let resposta: Response;
   try {
-    resposta = await fetch(`${process.env.BACKEND_URL ?? "http://localhost:3000"}/login`, {
+    resposta = await fetch(`${process.env.BACKEND_URL ?? "http://localhost:3001"}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dados),

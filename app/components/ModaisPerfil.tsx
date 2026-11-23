@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Usuario {
   id: number;
@@ -32,8 +33,8 @@ export default function ModaisPerfil({
   onUsuarioAtualizado,
   onFechar,
 }: ModaisPerfilProps) {
-  const [modal, setModal] = useState<"editar" | "senha">("editar");
-
+  const [modal, setModal] = useState<"editar" | "senha" | "excluir">("editar");
+  const router = useRouter();
   const [nome, setNome] = useState(usuario.nome);
   const [username, setUsername] = useState(usuario.username);
   const [email, setEmail] = useState(usuario.email ?? "");
@@ -207,6 +208,53 @@ export default function ModaisPerfil({
     }
   }
 
+
+  async function excluirConta(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setErro("");
+    setMensagem("");
+
+    if (!senhaAtual) {
+      setErro("Informe sua senha atual para confirmar a exclusão.");
+      return;
+    }
+
+    setCarregando(true);
+
+    try {
+      const resposta = await fetch("/api/user/me", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ senhaAtual }),
+      });
+
+      const dados = await resposta.json().catch(() => null);
+
+      if (!resposta.ok) {
+        throw new Error(
+          dados?.message || "Não foi possível excluir a conta.",
+        );
+      }
+
+      try {
+        await fetch("/api/session", { method: "DELETE" });
+      } catch {
+        // A conta já foi excluída; continuar para a tela de login.
+      }
+
+      router.replace("/login");
+      router.refresh();
+    } catch (error) {
+      setErro(
+        error instanceof Error
+          ? error.message
+          : "Erro ao excluir a conta.",
+      );
+    } finally {
+      setCarregando(false);
+    }
+  }
+
   const campo =
     "w-full rounded-2xl border border-transparent bg-white px-3 py-3 text-sm text-[#252525] outline-none placeholder:text-gray-400 focus:border-[#6A38F3]";
 
@@ -290,9 +338,13 @@ export default function ModaisPerfil({
               <div className="pt-8">
                 <button
                   type="button"
-                  disabled
-                  title="Funcionalidade ainda não implementada"
-                  className="w-full rounded-full border border-red-500 py-2 text-red-600 opacity-60"
+                  onClick={() => {
+                    setModal("excluir");
+                    setSenhaAtual("");
+                    setErro("");
+                    setMensagem("");
+                  }}
+                  className="w-full rounded-full border border-red-500 py-2 text-red-600 transition hover:bg-red-50"
                 >
                   Deletar conta
                 </button>
@@ -319,7 +371,7 @@ export default function ModaisPerfil({
               </div>
             </form>
           </>
-        ) : (
+        ) : modal === "senha" ? (
           <>
             <button
               type="button"
@@ -386,10 +438,71 @@ export default function ModaisPerfil({
                   disabled={carregando}
                   className="w-full rounded-full bg-[#6A38F3] py-2 text-white shadow-md transition hover:bg-[#5229D4] disabled:opacity-60"
                 >
-                  {carregando ? "Salvando..." : "Salvar Senha"}
+                                 {carregando ? "Salvando..." : "Salvar Senha"}
                 </button>
               </div>
             </form>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                setModal("editar");
+                setSenhaAtual("");
+                setErro("");
+                setMensagem("");
+              }}
+              aria-label="Voltar para edição do perfil"
+              className="absolute left-7 top-7 text-3xl text-black"
+            >
+              ‹
+            </button>
+
+            <div className="pt-8">
+              <h2 className="mb-5 text-center text-xl font-bold text-red-600">
+                Excluir conta
+              </h2>
+
+              <p className="mb-5 text-center text-sm text-gray-700">
+                Tem certeza de que deseja excluir sua conta? Essa ação é
+                permanente e não poderá ser desfeita. Seus dados pessoais
+                e conteúdos vinculados à conta serão excluídos.
+              </p>
+
+              <form onSubmit={excluirConta} className="space-y-4">
+                <input
+                  className={campo}
+                  type="password"
+                  placeholder="Digite sua senha atual"
+                  value={senhaAtual}
+                  onChange={(e) => setSenhaAtual(e.target.value)}
+                  autoComplete="current-password"
+                />
+
+                <button
+                  type="submit"
+                  disabled={carregando}
+                  className="w-full rounded-full bg-red-600 py-2 text-white shadow-md transition hover:bg-red-700 disabled:opacity-60"
+                >
+                  {carregando ? "Excluindo..." : "Confirmar exclusão"}
+                </button>
+
+                <button
+                  type="button"
+                  disabled={carregando}
+                  onClick={() => {
+                    setModal("editar");
+                    setSenhaAtual("");
+                    setErro("");
+                    setMensagem("");
+                  }}
+                  className="w-full rounded-full border border-gray-400 py-2 text-gray-700 transition hover:bg-gray-100 disabled:opacity-60"
+                >
+                  Cancelar
+                </button>
+              </form>
+            </div>
           </>
         )}
 

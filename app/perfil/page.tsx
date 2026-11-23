@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import Perfil from "../components/perfil";
 
-const BACKEND = process.env.BACKEND_URL ?? "http://localhost:3000";
+const BACKEND = process.env.BACKEND_URL ?? "http://localhost:3001";
 
 export default function PerfilPage() {
   return (
@@ -46,12 +46,18 @@ async function PerfilCarregado() {
   const [lojasAPI, produtosAPI, avaliacoesLojas, avaliacoesProdutos] =
     await Promise.all(respostas.map((r) => r.json()));
 
-  const lojas = lojasAPI.map((loja: any) => ({
+  const lojas = lojasAPI.map((loja: any) => {
+  const logoFilename = loja.logo_url?.split("/").pop();
+
+  return {
     id: loja.id,
     nome: loja.nome,
     categoria: loja.categoria?.nome || "Sem categoria",
-    logoUrl: loja.logo_url || undefined,
-  }));
+    logoUrl: loja.logo_url?.startsWith("/uploads/lojas/") && logoFilename
+      ? `/api/store-image/${logoFilename}`
+      : loja.logo_url || undefined,
+  };
+  });
 
   const produtos = produtosAPI.map((produto: any) => ({
     id: produto.id,

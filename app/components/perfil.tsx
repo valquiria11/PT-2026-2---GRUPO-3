@@ -5,6 +5,7 @@ import CartaoProduto, { ProdutoProps } from "./CartaoProduto";
 import CartaoLoja, { LojaProps } from "./CartaoLoja";
 import CartaoAvaliacao, { AvaliacaoProps } from "./CartaoAvaliacao";
 import ModaisPerfil from "./ModaisPerfil";
+import ModalCriarLoja from "./ModalCriarLoja";
 
 interface Usuario {
   id: number;
@@ -74,7 +75,9 @@ export default function Perfil({
   avaliacoes = [],
 }: PerfilProps) {
   const [usuarioAtual, setUsuarioAtual] = useState(usuario);
+  const [lojasAtuais, setLojasAtuais] = useState(lojas);
   const [modalAberto, setModalAberto] = useState(false);
+  const [modalCriarLojaAberto, setModalCriarLojaAberto] = useState(false);
 
   return (
     <main className="min-h-screen bg-[#F5F0E8] px-6 py-12">
@@ -134,6 +137,7 @@ export default function Perfil({
                 <button
                   type="button"
                   aria-label="Adicionar loja"
+                  onClick={() => setModalCriarLojaAberto(true)}
                   className="flex h-10 w-10 items-center justify-center rounded-full bg-[#6A38F3] text-2xl text-white transition hover:bg-[#5229D4]"
                 >
                   +
@@ -143,12 +147,13 @@ export default function Perfil({
               )
             }
           />
-          {lojas.length === 0 ? (
+
+          {lojasAtuais.length === 0 ? (
             <Vazio texto="Nenhuma loja por aqui ainda." />
           ) : (
             <div className="mt-4 flex flex-col gap-4">
-              {lojas.map((l) => (
-                <CartaoLoja key={l.id} {...l} />
+              {lojasAtuais.map((loja) => (
+                <CartaoLoja key={loja.id} {...loja} />
               ))}
             </div>
           )}
@@ -173,6 +178,15 @@ export default function Perfil({
           usuario={usuarioAtual}
           onUsuarioAtualizado={setUsuarioAtual}
           onFechar={() => setModalAberto(false)}
+        />
+      )}
+
+      {modalCriarLojaAberto && (
+        <ModalCriarLoja
+          onFechar={() => setModalCriarLojaAberto(false)}
+          onLojaCriada={(novaLoja) => {
+            setLojasAtuais((atuais) => [...atuais, novaLoja]);
+          }}
         />
       )}
     </main>
