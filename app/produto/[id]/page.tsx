@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -27,7 +27,7 @@ const AVALIACOES_PADRAO: Avaliacao[] = [
   },
 ];
 
-export default function ProdutoDetalhePage() {
+function ConteudoProduto() {
   const params = useParams();
   const router = useRouter();
   const idProduto = Number(params.id);
@@ -253,5 +253,13 @@ export default function ProdutoDetalhePage() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function ProdutoDetalhePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F7F4E8]" />}>
+      <ConteudoProduto />
+    </Suspense>
   );
 }
