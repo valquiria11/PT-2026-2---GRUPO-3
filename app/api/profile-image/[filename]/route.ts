@@ -8,7 +8,7 @@ export async function GET(
     return new Response(null, { status: 400 });
   }
 
-  const backend = process.env.BACKEND_URL ?? "http://localhost:3000";
+  const backend = process.env.BACKEND_URL ?? "http://localhost:3001";
 
   try {
     const resposta = await fetch(
