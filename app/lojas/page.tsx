@@ -172,7 +172,7 @@ export default function Lojas() {
                 </div>
 
                 {/*Grid das lojas*/}
-                <div className="grid items-center justify-center grid-cols-5">
+                <div className="grid items-center justify-center grid-cols-5 py-10 px-10">
                     {lojasPaginadas.map((loja) => (
                         <div key={loja.id} className="flex flex-col items-center min-w-0">
                             <div className="relative w-36 h-36 rounded-full overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer hover:scale-105 transition-transform">
@@ -185,7 +185,7 @@ export default function Lojas() {
                                     />
                                 )}
                             </div>
-                            <span className="text-sm font-bold text-[#171918] mt-2 text-center">
+                            <span className="text-sm font-bold text-[#171918] mt-2 text-center capitalize">
                               {loja.nome}
                             </span>
                             <span className="text-xs text-[#6735E8] capitalize">
@@ -202,7 +202,7 @@ export default function Lojas() {
                         aria-label="Página anterior"
                         disabled={pagina === 1}
                         onClick={() => setPagina(pagina - 1)}
-                        className="cursor-pointer disabled:cursor-default disabled:opacity-30"
+                        className="cursor-pointer disabled:cursor-blocked disabled:opacity-30"
                     >
                     <MdKeyboardArrowLeft size={60}/>
                     </button>
@@ -214,7 +214,7 @@ export default function Lojas() {
                                 type="button"
                                 onClick={() => setPagina(numero)}
                                 className={`w-10 h-10 rounded-full cursor-pointer
-                                    ${pagina === numero? "bg-[#6A38F3] text-white" : "bg-white text-[#6A38F3]"} `}
+                                    ${pagina === numero? "font-bold text-black" : "text-black"} `}
                             >
                                 {numero}
                             </button>
