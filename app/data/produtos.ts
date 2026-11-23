@@ -1,3 +1,11 @@
+export interface Avaliacao {
+  id: number;
+  usuario: string;
+  fotoUsuario: string;
+  comentario: string;
+  estrelas: number;
+}
+
 export interface Produto {
   id: number;
   nome: string;
@@ -15,6 +23,7 @@ export interface Produto {
   descricao?: string;
   ingredientes?: string;
   alergicos?: string;
+  avaliacoes?: Avaliacao[];
 }
 
 export const TODOS_PRODUTOS: Produto[] = [
