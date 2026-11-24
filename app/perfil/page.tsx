@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import Perfil from "../components/perfil";
+import { imagemLoja, imagemProduto } from "../lib/products";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:3001";
 
@@ -46,18 +47,12 @@ async function PerfilCarregado() {
   const [lojasAPI, produtosAPI, avaliacoesLojas, avaliacoesProdutos] =
     await Promise.all(respostas.map((r) => r.json()));
 
-  const lojas = lojasAPI.map((loja: any) => {
-  const logoFilename = loja.logo_url?.split("/").pop();
-
-  return {
+  const lojas = lojasAPI.map((loja: any) => ({
     id: loja.id,
     nome: loja.nome,
     categoria: loja.categoria?.nome || "Sem categoria",
-    logoUrl: loja.logo_url?.startsWith("/uploads/lojas/") && logoFilename
-      ? `/api/store-image/${logoFilename}`
-      : loja.logo_url || undefined,
-  };
-  });
+    logoUrl: imagemLoja(loja.logo_url),
+  }));
 
   const produtos = produtosAPI.map((produto: any) => ({
     id: produto.id,
@@ -67,8 +62,8 @@ async function PerfilCarregado() {
       currency: "BRL",
     }),
     disponivel: produto.stock > 0,
-    imagemUrl: produto.imagens?.[0]?.image_url || "/img.png",
-    lojaUrl: produto.loja?.logo_url || undefined,
+    imagemUrl: imagemProduto(produto) || "/img.png",
+    lojaUrl: imagemLoja(produto.loja?.logo_url),
     nomeLoja: produto.loja?.nome || undefined,
   }));
 

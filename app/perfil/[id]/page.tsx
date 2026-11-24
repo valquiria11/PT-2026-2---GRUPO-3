@@ -3,8 +3,9 @@ import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import Perfil from "../../components/perfil";
+import { imagemLoja, imagemProduto } from "../../lib/products";
 
-const BACKEND = process.env.BACKEND_URL ?? "http://localhost:3000";
+const BACKEND = process.env.BACKEND_URL ?? "http://localhost:3001";
 
 type Params = Promise<{ id: string }>;
 
@@ -80,7 +81,7 @@ async function PerfilPublicoCarregado({
     id: loja.id,
     nome: loja.nome,
     categoria: loja.categoria?.nome || "Sem categoria",
-    logoUrl: loja.logo_url || undefined,
+    logoUrl: imagemLoja(loja.logo_url),
   }));
 
   const produtos = produtosAPI.map((produto: any) => ({
@@ -91,8 +92,8 @@ async function PerfilPublicoCarregado({
       currency: "BRL",
     }),
     disponivel: produto.stock > 0,
-    imagemUrl: produto.imagens?.[0]?.image_url || "/img.png",
-    lojaUrl: produto.loja?.logo_url || undefined,
+    imagemUrl: imagemProduto(produto) || "/img.png",
+    lojaUrl: imagemLoja(produto.loja?.logo_url),
     nomeLoja: produto.loja?.nome || undefined,
   }));
 

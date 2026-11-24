@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useProducts } from "../../hooks/useProducts";
-import { imagemProduto, type Produto } from "../../lib/products";
+import { imagemLoja, imagemProduto, type Produto } from "../../lib/products";
 
 type Categorias = {
   id: number;
@@ -440,9 +440,10 @@ function CardProduto({
       {loja.logo_url && (
          <div className="absolute right-4 top-4 z-10 h-[68px] w-[68px] overflow-hidden rounded-full">
            <Image
-             src={loja.logo_url}
+             src={imagemLoja(loja.logo_url)!}
              alt={`Logo ${loja.nome}`}
              fill
+             unoptimized
              className="object-cover"
            />
          </div>

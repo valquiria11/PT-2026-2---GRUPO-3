@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import CartaoProduto from "../components/CartaoProduto";
 import { useProducts } from "../hooks/useProducts";
-import { imagemProduto } from "../lib/products";
+import { imagemLoja, imagemProduto } from "../lib/products";
 
 
 const CATEGORIAS = [
@@ -221,7 +221,7 @@ export default function FeedPage() {
                     preco={produto.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                     disponivel={produto.stock > 0}
                     imagemUrl={imagemProduto(produto) ?? ""}
-                    lojaUrl={produto.loja.logo_url ?? undefined}
+                    lojaUrl={imagemLoja(produto.loja.logo_url)}
                     nomeLoja={produto.loja.nome}
                   />
                 ))}

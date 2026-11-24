@@ -20,3 +20,11 @@ export function imagemProduto(produto: Produto) {
   const filename = url.slice("/uploads/products/".length);
   return `/api/product-image/${encodeURIComponent(filename)}`;
 }
+
+export function imagemLoja(url: string | null | undefined) {
+  if (!url) return undefined;
+  if (!url.startsWith("/uploads/lojas/")) return url;
+
+  const filename = url.slice("/uploads/lojas/".length);
+  return `/api/store-image/${encodeURIComponent(filename)}`;
+}
