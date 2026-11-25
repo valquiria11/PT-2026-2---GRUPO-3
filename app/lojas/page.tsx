@@ -151,7 +151,7 @@ return(
             <div className="flex items-center justify-between">
                 <h1 className="text-black text-3xl font-semibold">Lojas</h1>
                 {/*Filtros*/}
-                <div className="relative w-[468px]">
+                <div className="relative z-50 w-[468px]">
                     <button
                         type="button"
                         onClick={() => setFiltroAberto(!filtroAberto)}
@@ -164,7 +164,7 @@ return(
                     </button>
                             
                     {filtroAberto && (
-                        <div className="absolute w-[468px] top-full z-50 bg-white rounded-2xl shadow-lg p-5">
+                        <div className="absolute w-[468px] top-full bg-white rounded-2xl shadow-lg p-5">
                             <div className="flex flex-col">
                                 {categorias.map((categoria) => (
                                     <label
