@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link";
 import Image from "next/image";
-import api from "../services/api"
+import axios from "axios";
 import { Vegetables } from "@healthicons/react"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Medicine02Icon } from "@hugeicons/core-free-icons"
@@ -52,12 +52,13 @@ export default function Lojas() {
 
     const fetchLojas = async () => {
         try {
-            const res = await api.get("/lojas");
+            const res = await axios.get<Lojas[]>("/api/lojas");
+
             setLojas(res.data);
         } catch (error) {
-            console.error("Erro ao buscar lojas", error);
+            console.error("Erro ao buscar lojas:", error);
         }
-    }
+    };
 
     {/*Filtro*/}
     const [categoriaFiltro, setCategoriaFiltro] = useState<number[]>([]);
@@ -185,11 +186,11 @@ export default function Lojas() {
                                     />
                                 )}
                             </div>
-                            <span className="text-sm font-bold text-[#171918] mt-2 text-center capitalize">
+                            <span className="text-sm font-bold text-[#171918] mt-2 text-center capitalize cursor-pointer hover:underline">
                               {loja.nome}
                             </span>
-                            <span className="text-xs text-[#6735E8] capitalize">
-                              {Categorias.find((categoria) => categoria.id === loja.categoria_id)?.nome}
+                            <span className="text-xs text-[#6735E8] capitalize cursor-pointer hover:underline">
+                              {Categorias.find((categoria) => categoria.id === loja.categoria_id) ?.nome}
                             </span>
                         </div>
                     ))}
