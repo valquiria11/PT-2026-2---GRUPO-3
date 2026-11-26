@@ -7,6 +7,17 @@ const nextConfig: NextConfig = {
   },
   cacheComponents: true,
   partialPrefetching: true,
+  images: {
+        remotePatterns: [
+            {
+                protocol: "http",
+                hostname: "localhost",
+                port: "3001",
+                pathname: "/uploads/**",
+            },
+        ],
+        dangerouslyAllowLocalIP: true,
+    },
 };
 
 export default nextConfig;
