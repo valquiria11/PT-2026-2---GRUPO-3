@@ -87,13 +87,15 @@ function LojaConteudo(){
   const [lojas, setLojas] = useState<Lojas[]>([]);
   const [categorias, setCategorias] = useState<Categorias[]>([])
   const { produtos, carregando, erro } = useProducts("");
-  const [avaliacoes, setAvaliacoes] = useState<ResultadoAvaliacoes | null>(null);
+  const [avaliacoesLojas, setAvaliacoesLojas] = useState<ResultadoAvaliacoes | null>(null);
+  const [avaliacoesProd, setAvaliacoesProd] = useState<ResultadoAvaliacoes | null>(null);
 
   //API
   useEffect(() => {
     fetchLojas();
     fetchCategorias();
-    fetchAvaliacoes();
+    fetchAvaliacoesLoja();
+    fetchAvaliacoesProd();
   }, []);
 
   const fetchLojas = async () => {
@@ -112,12 +114,20 @@ function LojaConteudo(){
       console.error("Erro ao buscar categorias", error);
     }
   }
-  const fetchAvaliacoes = async () => {
+  const fetchAvaliacoesLoja = async () => {
     try {
       const res = await api.get<ResultadoAvaliacoes>(`avaliacao/loja?alvoId=${lojaId}`);
-      setAvaliacoes(res.data);
+      setAvaliacoesLojas(res.data);
     } catch (error) {
-      console.error("Erro ao buscar avaliações.", error);
+      console.error("Erro ao buscar avaliações da loja.", error);
+    }
+  }
+  const fetchAvaliacoesProd = async () => {
+    try {
+      const res = await api.get<ResultadoAvaliacoes>("avaliacao/produto");
+      setAvaliacoesProd(res.data);
+    } catch (error) {
+      console.error("Erro ao buscar avaliações dos produtos.")
     }
   }
 
@@ -128,7 +138,7 @@ function LojaConteudo(){
   const categoriaLoja = categorias.find(
     (cat) => cat.id === loja?.categoria_id
   );
-  const produtosLoja = produtos.filter(
+  const produtosdaLoja = produtos.filter(
     (produto) => produto.loja?.id === lojaId
   );
 
@@ -143,6 +153,8 @@ function LojaConteudo(){
   }
 
   const banner = imagemLoja(loja.banner_url);
+  const produtosLoja = produtos.filter((produto => produto.loja.id === lojaId))
+  
 
   return (
     <main className="min-h-screen bg-[#F6F3E4]">
@@ -190,19 +202,19 @@ function LojaConteudo(){
       </header>
     
       {/*Reviews e Comentários*/}
-      <section className="w-full h-[600px] bg-black flex flex-col items-center justify-center">
+      <section className="relative w-full h-[600px] bg-black flex flex-col justify-center items-center">
         <h2 className="text-5xl text-white p-5">Reviews e Comentários</h2>
           
-        {avaliacoes && (
+        {avaliacoesLojas && (
           <div className="flex flex-col items-center gap-2">
-            <p className="text-7xl ">{avaliacoes.media}</p>
+            <p className="text-7xl ">{avaliacoesLojas.media}</p>
 
             {/*Estrelas*/}
             <div className="relative flex">
               <div className="text-7xl text-gray">
                 ★★★★★
               </div>
-              <div className="absolute text-[#FFE44D] text-7xl overflow-hidden" style={{width: `${avaliacoes.media/5*100}%`}}> 
+              <div className="absolute text-[#FFE44D] text-7xl overflow-hidden" style={{width: `${avaliacoesLojas.media/5*100}%`}}> 
                 ★★★★★
               </div>
             </div>
@@ -210,14 +222,11 @@ function LojaConteudo(){
           )}
 
         {/*Cartões de Avaliação*/}
-        {avaliacoes?.avaliacoes.length ? (
-          <div className="w-full max-w-[1120px] flex gap-5 overflow-x-auto py-15 scrollbar-none">
+        {avaliacoesLojas?.avaliacoes.length ? (
+          <div className="flex gap-5 overflow-x-auto py-15 scrollbar-none w-full max-w-[1212px]">
           
-            {avaliacoes.avaliacoes.map((avaliacao) => (
-            <div
-              key={avaliacao.id}
-              className="w-full"
-            >
+            {avaliacoesLojas.avaliacoes.map((avaliacao) => (
+            <div key={avaliacao.id} className="w-full">
               <CartaoAvaliacao
                 id={avaliacao.id}
                 autorNome={avaliacao.usuario.nome}
@@ -228,12 +237,20 @@ function LojaConteudo(){
             ))};
 
           </div>
-        ) : ( <p className="text-gray-500 text-2xl">
+        ) : ( <p className="text-gray-500 text-3xl">
               Esta loja ainda não possui avaliações.
               </p>
         )}
       </section>
+      
+      <section className="w-full px-[100px] my-10">
+        <div className="flex items-baseline">
+          <h3 className="text-black text-5xl font-medium">Produtos</h3><p className="text-2xl m-2 text-black">melhor avaliados</p>
+        </div>
+        <div>
 
+        </div>
+      </section>
     </main>
   )
 }
