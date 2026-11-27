@@ -195,12 +195,16 @@ return(
                     <div key={loja.id} className="flex flex-col items-center min-w-0 p-5">
                         <div className="relative w-36 h-36 rounded-full overflow-hidden bg-white shadow-sm border border-gray-100 cursor-pointer hover:scale-105 transition-transform">
                             {loja.logo_url && (
-                                <Image
-                                  src={`http://localhost:3001${loja.logo_url}`}
-                                  alt={loja.nome}
-                                  fill
-                                  className="object-cover"
-                                />
+                                <Link
+                                    key={loja.id}
+                                    href={`/lojas/${loja.id}`}>
+                                    <Image
+                                      src={`http://localhost:3001${loja.logo_url}`}
+                                      alt={loja.nome}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                </Link>
                             )}
                         </div>
                         <span className="text-sm font-bold text-[#171918] mt-2 text-center capitalize cursor-pointer hover:underline">
