@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -48,7 +48,16 @@ function formatPreco(preco: number) {
 }
 
 export default function CategoriaPage() {
-  // ID da categoria principal na URL
+
+    return (
+    <Suspense fallback={<p>Carregando categoria...</p>}>
+      <ConteudoCategoria />
+    </Suspense>
+  );
+}
+
+function ConteudoCategoria() {
+  
   const params = useParams<{ id: string }>();
   const categoriaId = Number(params.id);
 
