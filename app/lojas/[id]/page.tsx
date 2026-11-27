@@ -158,30 +158,33 @@ function LojaConteudo(){
               alt={loja.nome}
               fill
               unoptimized
-              className="object-cover"
+              className="object-cover object-center"
             />
           )}
-          <div className="flex flex-col justify-center text-[#F6F3E4] capitalize">
-            <h1 className="text-9xl font-medium">{loja.nome}</h1>
-            <Link
-              key={categoriaLoja?.id}
-              href={`/categoria/${categoriaLoja?.id}`}
-              className="cursor-pointer hover:underline">
-              <span className="text-2xl">{categoriaLoja?.nome}</span>
-            </Link>
-          </div>
 
-          {/*Autor*/}
-          <div className="absolute bottom-[35px] right-[150px]">
-            {loja.usuario?.nome && (
+          <div className="absolute inset-0 bg-linear-to-b from-black/100 to-black/40 flex justify-center">
+            <div className="flex flex-col justify-center text-[#F6F3E4] capitalize z-10 mx-10">
+              <h1 className="text-8xl font-medium">{loja.nome}</h1>
               <Link
-                key={loja.usuario.nome}
-                href={`/perfil/${loja.usuario.id}`}
-                className="text-xl text-[#F6F3E4] flex items-baseline-last gap-2"
-                >
-                by<p className="cursor-pointer hover:underline capitalize">{loja.usuario.nome}</p>
+                key={categoriaLoja?.id}
+                href={`/categoria/${categoriaLoja?.id}`}
+                className="cursor-pointer hover:underline">
+                <span className="text-2xl">{categoriaLoja?.nome}</span>
               </Link>
-            )}
+            </div>
+
+            {/*Autor*/}
+            <div className="absolute bottom-[35px] right-0 mx-25">
+              {loja.usuario?.nome && (
+                <Link
+                  key={loja.usuario.nome}
+                  href={`/perfil/${loja.usuario.id}`}
+                  className="text-xl text-[#F6F3E4] flex items-baseline-last gap-2"
+                  >
+                  by<p className="cursor-pointer hover:underline capitalize">{loja.usuario.nome}</p>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -189,11 +192,11 @@ function LojaConteudo(){
       {/*Reviews e Comentários*/}
       <section className="w-full h-[600px] bg-black flex flex-col items-center justify-center">
         <h2 className="text-5xl text-white p-5">Reviews e Comentários</h2>
-        
-        {/*Nota média*/}  
+          
         {avaliacoes && (
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center gap-2">
             <p className="text-7xl ">{avaliacoes.media}</p>
+
             {/*Estrelas*/}
             <div className="relative flex">
               <div className="text-7xl text-gray">
@@ -204,8 +207,33 @@ function LojaConteudo(){
               </div>
             </div>
           </div>
+          )}
+
+        {/*Cartões de Avaliação*/}
+        {avaliacoes?.avaliacoes.length ? (
+          <div className="w-full max-w-[1120px] flex gap-5 overflow-x-auto py-15 scrollbar-none">
+          
+            {avaliacoes.avaliacoes.map((avaliacao) => (
+            <div
+              key={avaliacao.id}
+              className="w-full"
+            >
+              <CartaoAvaliacao
+                id={avaliacao.id}
+                autorNome={avaliacao.usuario.nome}
+                nota={avaliacao.nota}
+                comentario={avaliacao.comentario ?? ""}
+              />
+            </div>
+            ))};
+
+          </div>
+        ) : ( <p className="text-gray-500 text-2xl">
+              Esta loja ainda não possui avaliações.
+              </p>
         )}
       </section>
+
     </main>
   )
 }
