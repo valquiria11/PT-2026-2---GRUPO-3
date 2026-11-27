@@ -1,9 +1,22 @@
+export interface RespostaAvaliacao {
+  id: number;
+  usuario: string;
+  fotoUsuario: string;
+  dataCriacao?: string;
+  tempo?: string;
+  cargo?: string;
+  texto: string;
+}
+
 export interface Avaliacao {
   id: number;
   usuario: string;
   fotoUsuario: string;
+  dataCriacao?: string;
+  tempo?: string;
   comentario: string;
   estrelas: number;
+  respostas?: RespostaAvaliacao[];
 }
 
 export interface Produto {
