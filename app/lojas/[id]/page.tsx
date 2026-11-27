@@ -9,6 +9,8 @@ import CartaoAvaliacao from "@/app/components/CartaoAvaliacao";
 import { useProducts } from "@/app/hooks/useProducts";
 import { imagemLoja, imagemProduto, type Produto } from "@/app/lib/products";
 import api from "@/app/services/api";
+import axios from "axios";
+import { Verified } from "lucide-react";
 
 type Lojas = {
     id: number;
@@ -58,6 +60,12 @@ type ResultadoAvaliacoes = {
   avaliacoes: Avaliacoes[];
 }
 
+type Usuario = {
+  id: number;
+  nome: string;
+};
+
+
 function propsCartao(produto: Produto) {
   return {
     id: produto.id,
@@ -84,11 +92,17 @@ export default function LojaPage() {
 function LojaConteudo(){
   const params = useParams<{ id: string }>();
   const lojaId = Number(params.id);
+  const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(null);
+
   const [lojas, setLojas] = useState<Lojas[]>([]);
   const [categorias, setCategorias] = useState<Categorias[]>([])
   const { produtos, carregando, erro } = useProducts("");
+
+
   const [avaliacoesLojas, setAvaliacoesLojas] = useState<ResultadoAvaliacoes | null>(null);
   const [avaliacoesProd, setAvaliacoesProd] = useState<ResultadoAvaliacoes | null>(null);
+  const [melhorAvaliados, setMelhorAvaliados] = useState<[]>([]);
+
 
   //API
   useEffect(() => {
@@ -131,6 +145,18 @@ function LojaConteudo(){
     }
   }
 
+  useEffect(() => {
+    async function login() {
+      try {
+        const res = await axios.get<Usuario>("/api/session");
+        setUsuarioLogado(res.data);
+      } catch {
+        setUsuarioLogado(null);
+      }
+    }
+    login();
+  }, []);
+
   //identificação
   const loja = lojas.find(
     (item) => item.id === lojaId
@@ -141,6 +167,7 @@ function LojaConteudo(){
   const produtosdaLoja = produtos.filter(
     (produto) => produto.loja?.id === lojaId
   );
+  
 
   //validação
   if (!Number.isInteger(lojaId) || lojaId <= 0) {
@@ -153,7 +180,37 @@ function LojaConteudo(){
   }
 
   const banner = imagemLoja(loja.banner_url);
-  const produtosLoja = produtos.filter((produto => produto.loja.id === lojaId))
+
+  //melhores avaliados
+  const notasPorProduto = new Map<
+    number,
+    { soma: number; total: number }
+  >();
+
+  for (const avaliacao of avaliacoesProd?.avaliacoes ?? []) {
+    if (avaliacao.produto_id === undefined) continue;
+
+    const atual = notasPorProduto.get(avaliacao.produto_id) ?? {
+      soma: 0,
+      total: 0,
+    };
+
+    notasPorProduto.set(avaliacao.produto_id, {
+      soma: atual.soma + avaliacao.nota,
+      total: atual.total + 1,
+    });
+  }
+  const melhoresAvaliados = [...produtosdaLoja]
+  .sort((a, b) => {
+      const notaA = notasPorProduto.get(a.id)!;
+      const notaB = notasPorProduto.get(b.id)!;
+
+      const mediaA = notaA.soma / notaA.total;
+      const mediaB = notaB.soma / notaB.total;
+
+      return mediaB - mediaA || notaB.total - notaA.total;
+    })
+    .slice(0, 6);
   
 
   return (
@@ -254,4 +311,3 @@ function LojaConteudo(){
     </main>
   )
 }
-
