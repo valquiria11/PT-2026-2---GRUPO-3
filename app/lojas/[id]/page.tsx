@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import CartaoProduto from "@/app/components/CartaoProduto";
+import CartaoAvaliacao from "@/app/components/CartaoAvaliacao";
 import { useProducts } from "@/app/hooks/useProducts";
 import { imagemLoja, imagemProduto, type Produto } from "@/app/lib/products";
 import api from "@/app/services/api";
@@ -35,6 +36,28 @@ type Categorias = {
   updated_at?: string;
 };
 
+type Avaliacoes = {
+  id: number;
+  usuario_id: number;
+  loja_id?: number;
+  produto_id?: number;
+  nota: number;
+  comentario: string | null;
+  created_at: string;
+
+  usuario: {
+    id: number;
+    nome: string;
+    username: string;
+  };
+}
+
+type ResultadoAvaliacoes = {
+  media: number;
+  totalAvaliacoes: number;
+  avaliacoes: Avaliacoes[];
+}
+
 function propsCartao(produto: Produto) {
   return {
     id: produto.id,
@@ -64,11 +87,13 @@ function LojaConteudo(){
   const [lojas, setLojas] = useState<Lojas[]>([]);
   const [categorias, setCategorias] = useState<Categorias[]>([])
   const { produtos, carregando, erro } = useProducts("");
+  const [avaliacoes, setAvaliacoes] = useState<ResultadoAvaliacoes | null>(null);
 
   //API
   useEffect(() => {
     fetchLojas();
     fetchCategorias();
+    fetchAvaliacoes();
   }, []);
 
   const fetchLojas = async () => {
@@ -85,6 +110,14 @@ function LojaConteudo(){
       setCategorias(res.data);
     } catch (error) {
       console.error("Erro ao buscar categorias", error);
+    }
+  }
+  const fetchAvaliacoes = async () => {
+    try {
+      const res = await api.get<ResultadoAvaliacoes>(`avaliacao/loja?alvoId=${lojaId}`);
+      setAvaliacoes(res.data);
+    } catch (error) {
+      console.error("Erro ao buscar avaliações.", error);
     }
   }
 
@@ -114,42 +147,66 @@ function LojaConteudo(){
   return (
     <main className="min-h-screen bg-[#F6F3E4]">
 
-      {/*Banner*/}
+      {/*Header*/}
       <header className="relative w-full h-[540px] bg-black flex justify-center">
-        {banner && (
-          <Image
-            src={banner}
-            alt={loja.nome}
-            fill
-            unoptimized
-            className="object-cover"
-          />
-        )}
-        <div className="flex flex-col justify-center text-[#F6F3E4] capitalize">
-          <h1 className="text-9xl font-medium">{loja.nome}</h1>
-          <Link
-            key={categoriaLoja?.id}
-            href={`/categoria/${categoriaLoja?.id}`}
-            className="cursor-pointer hover:underline">
-            <span className="text-2xl">{categoriaLoja?.nome}</span>
-          </Link>
-        </div>
 
-        <div className="absolute bottom-[35px] right-[150px]">
-          {loja.usuario?.nome && (
-            <Link
-              key={loja.usuario.nome}
-              href={`/perfil/${loja.usuario.id}`}
-              className="text-xl flex items-baseline-last gap-2"
-              >
-              by<p className="cursor-pointer hover:underline capitalize">{loja.usuario.nome}</p>
-            </Link>
+        {/*Banner*/}
+        <div className="relative h-[540px] w-full flex justify-center">
+          {banner && (
+            <Image
+              src={banner}
+              alt={loja.nome}
+              fill
+              unoptimized
+              className="object-cover"
+            />
           )}
+          <div className="flex flex-col justify-center text-[#F6F3E4] capitalize">
+            <h1 className="text-9xl font-medium">{loja.nome}</h1>
+            <Link
+              key={categoriaLoja?.id}
+              href={`/categoria/${categoriaLoja?.id}`}
+              className="cursor-pointer hover:underline">
+              <span className="text-2xl">{categoriaLoja?.nome}</span>
+            </Link>
+          </div>
+
+          {/*Autor*/}
+          <div className="absolute bottom-[35px] right-[150px]">
+            {loja.usuario?.nome && (
+              <Link
+                key={loja.usuario.nome}
+                href={`/perfil/${loja.usuario.id}`}
+                className="text-xl text-[#F6F3E4] flex items-baseline-last gap-2"
+                >
+                by<p className="cursor-pointer hover:underline capitalize">{loja.usuario.nome}</p>
+              </Link>
+            )}
+          </div>
         </div>
-        
       </header>
+    
+      {/*Reviews e Comentários*/}
+      <section className="w-full h-[600px] bg-black flex flex-col items-center justify-center">
+        <h2 className="text-5xl text-white p-5">Reviews e Comentários</h2>
+        
+        {/*Nota média*/}  
+        {avaliacoes && (
+          <div className="flex flex-col items-center">
+            <p className="text-7xl ">{avaliacoes.media}</p>
+            {/*Estrelas*/}
+            <div className="relative flex">
+              <div className="text-7xl text-gray">
+                ★★★★★
+              </div>
+              <div className="absolute text-[#FFE44D] text-7xl overflow-hidden" style={{width: `${avaliacoes.media/5*100}%`}}> 
+                ★★★★★
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
     </main>
-  
   )
 }
 
