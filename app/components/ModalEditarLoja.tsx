@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { type ChangeEvent, SubmitEvent } from "react";
 
 interface Categoria {
   id: number;
@@ -15,17 +16,30 @@ interface LojaCriada {
   logoUrl?: string;
 }
 
-interface ModalCriarLojaProps {
+export interface Loja {
+  id: number;
+  nome: string;
+  categoria_id: number;
+  logo_url?: string | null;
+  sticker_url?: string | null;
+  banner_url?: string | null;
+}
+
+interface ModalEditarLojaProps {
+  loja: Loja;
   onFechar: () => void;
-  onLojaCriada: (loja: LojaCriada) => void;
+  onLojaEditada: (loja: Loja) => void;
+  onLojaExcluida: () => void;
 }
 
 type TipoImagem = "sticker" | "logo" | "banner";
 
-export default function ModalCriarLoja({
+export default function ModalEditarLoja({
+  loja,
   onFechar,
-  onLojaCriada,
-}: ModalCriarLojaProps) {
+  onLojaEditada,
+  onLojaExcluida,
+}: ModalEditarLojaProps) {
   const [nome, setNome] = useState("");
   const [categoriaId, setCategoriaId] = useState("");
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -39,9 +53,11 @@ export default function ModalCriarLoja({
     logo: null,
     banner: null,
   });
-  const [lojaCriada, setLojaCriada] = useState<LojaCriada | null>(null);
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
+  const [excluindo, setExcluindo] = useState(false);
+  const [confirmarExclusao, setConfirmarExclusao] =
+    useState(false);
 
   const inputs = {
     sticker: useRef<HTMLInputElement>(null),
@@ -87,7 +103,7 @@ export default function ModalCriarLoja({
 
   function selecionarImagem(
     tipo: TipoImagem,
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: ChangeEvent<HTMLInputElement>,
   ) {
     const arquivo = event.target.files?.[0];
 
@@ -118,11 +134,49 @@ export default function ModalCriarLoja({
     }));
   }
 
-  async function enviarFormulario(event: React.FormEvent<HTMLFormElement>) {
+  async function atualizarImagens() {
+     if (!imagens.sticker && !imagens.logo && !imagens.banner) {
+       return null;
+     }
+    const formulario = new FormData();
+
+      if (imagens.sticker) {
+        formulario.append("sticker", imagens.sticker);
+      }
+    
+      if (imagens.logo) {
+        formulario.append("logo", imagens.logo);
+      }
+    
+      if (imagens.banner) {
+        formulario.append("banner", imagens.banner);
+      }
+
+  const resposta = await fetch(
+    `/api/lojas/${loja.id}/imagens`,
+    {
+      method: "POST",
+      body: formulario,
+    }
+  );
+
+  const dados = await resposta.json().catch(() => null);
+
+  if (!resposta.ok) {
+    throw new Error(
+      dados?.message ??
+        "Erro ao atualizar as imagens da loja."
+    );
+  }
+
+  return dados;
+}
+
+  async function enviarFormulario(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setErro("");
 
-    if (!lojaCriada && (!nome.trim() || !categoriaId)) {
+    if ((!nome.trim() || !categoriaId)) {
       setErro("Preencha o nome e selecione uma categoria.");
       return;
     }
@@ -130,11 +184,8 @@ export default function ModalCriarLoja({
     setCarregando(true);
 
     try {
-      let loja = lojaCriada;
-
-      if (!loja) {
-        const resposta = await fetch("/api/lojas", {
-          method: "POST",
+        const resposta = await fetch(`/api/lojas/${loja.id}`, {
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             nome: nome.trim(),
@@ -142,72 +193,81 @@ export default function ModalCriarLoja({
           }),
         });
 
-        const dados = await resposta.json();
+        const dados = await resposta.json().catch(() => null);
 
         if (!resposta.ok) {
           throw new Error(
-            dados.message || "Não foi possível criar a loja.",
+            dados?.message ?? "Não foi possível editar a loja."
           );
         }
 
-        const categoriaSelecionada = categorias.find(
-          (categoria) => categoria.id === Number(categoriaId),
-        );
-
-        loja = {
-          id: dados.id,
-          nome: dados.nome,
-          categoria: dados.categoria?.nome || categoriaSelecionada?.nome || "Sem categoria",
-          logoUrl: undefined,
+        let lojaAtualizada: Loja = {
+          ...loja,
+          ...dados,
+          id: loja.id,
+          nome: nome.trim(),
+          categoria_id: Number(categoriaId),
         };
-
-        setLojaCriada(loja);
-      }
-
-      const temImagem = Object.values(imagens).some(Boolean);
-
-      if (temImagem) {
-        const formulario = new FormData();
-
-        if (imagens.sticker) formulario.append("sticker", imagens.sticker);
-        if (imagens.logo) formulario.append("logo", imagens.logo);
-        if (imagens.banner) formulario.append("banner", imagens.banner);
-
-        const respostaImagem = await fetch(
-          `/api/lojas/${loja.id}/imagens`,
-          {
-            method: "POST",
-            body: formulario,
-          },
-        );
-
-        const dadosImagem = await respostaImagem.json();
-
-        if (!respostaImagem.ok) {
-          throw new Error(
-            dadosImagem.message ||
-              "A loja foi criada, mas não foi possível enviar as imagens. Tente novamente.",
-          );
-        }
-
-        const logoFilename = dadosImagem.logo_url?.split("/").pop();
-
-        if (dadosImagem.logo_url?.startsWith("/uploads/lojas/") && logoFilename) {
-          loja = {
-            ...loja,
-            logoUrl: `/api/store-image/${logoFilename}`,
+        onLojaEditada(lojaAtualizada);
+        const dadosImagem = await atualizarImagens();
+        
+        if (dadosImagem) {
+          lojaAtualizada = {
+          ...lojaAtualizada,
+          logo_url:
+            dadosImagem.logo_url ??
+            lojaAtualizada.logo_url,
+          sticker_url:
+            dadosImagem.sticker_url ??
+            lojaAtualizada.sticker_url,
+          banner_url:
+            dadosImagem.banner_url ??
+            lojaAtualizada.banner_url,
           };
+        onLojaEditada(lojaAtualizada);
         }
+        onFechar();
+      } catch (error) {
+        setErro(error instanceof Error ? error.message
+          : "Erro ao editar loja."
+        );
+      } finally {
+        setCarregando(false);
+      }
+    }
+
+    async function excluirLoja() {
+    setErro("");
+    setExcluindo(true);
+
+    try {
+      const resposta = await fetch(
+        `/api/lojas/${loja.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const dados = await resposta.json().catch(() => null);
+
+      if (!resposta.ok) {
+        throw new Error(
+          dados?.message ??
+            "Não foi possível excluir a loja."
+        );
       }
 
-      onLojaCriada(loja);
-      onFechar();
+      onLojaExcluida();
     } catch (error) {
       setErro(
-        error instanceof Error ? error.message : "Erro ao criar loja.",
+        error instanceof Error
+          ? error.message
+          : "Erro ao excluir loja."
       );
+
+      setConfirmarExclusao(false);
     } finally {
-      setCarregando(false);
+      setExcluindo(false);
     }
   }
 
