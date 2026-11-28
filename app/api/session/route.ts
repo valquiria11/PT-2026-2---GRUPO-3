@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   let dados: unknown;
@@ -43,4 +44,50 @@ export async function DELETE() {
   const resposta = NextResponse.json({ ok: true });
   resposta.cookies.delete("stockio_session");
   return resposta;
+}
+
+
+export async function GET() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("stockio_session")?.value;
+
+  if (!token) {
+    return NextResponse.json(
+      { message: "Não autenticado." },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const res = await fetch(
+      `${process.env.BACKEND_URL ?? "http://localhost:3001"}/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      }
+    );
+
+    if (!res.ok) {
+      return NextResponse.json(
+        { message: "Sessão inválida ou expirada." },
+        { status: res.status }
+      );
+    }
+
+    const usuario = await res.json();
+
+    return NextResponse.json({
+      id: usuario.sub,
+      nome: usuario.nome,
+    });
+  } catch (error) {
+    console.error("Erro ao consultar sessão:", error);
+
+    return NextResponse.json(
+      { message: "Erro ao verificar autenticação." },
+      { status: 503 }
+    );
+  }
 }
