@@ -11,6 +11,7 @@ import { imagemLoja, imagemProduto, type Produto } from "@/app/lib/products";
 import api from "@/app/services/api";
 import axios from "axios";
 import { LuPen } from "react-icons/lu";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 type Lojas = {
     id: number;
@@ -101,6 +102,7 @@ function LojaConteudo(){
 
   const [avaliacoesLojas, setAvaliacoesLojas] = useState<ResultadoAvaliacoes | null>(null);
   const [avaliacoesProd, setAvaliacoesProd] = useState<ResultadoAvaliacoes | null>(null);
+  const [pagina, setPagina] = useState(1);
 
 
   //API
@@ -208,6 +210,10 @@ function LojaConteudo(){
       return mediaB - mediaA || notaB.total - notaA.total;
     })
     .slice(0, 6);
+
+  //Paginação
+    const totalPaginas = Math.ceil(produtosdaLoja.length / 15);
+    const lojasPaginadas = produtosdaLoja.slice((pagina - 1) * 15, pagina * 15);
 
   return (
     <main className="min-h-screen bg-[#F6F3E4]">
@@ -346,9 +352,42 @@ function LojaConteudo(){
           />
         ))}
        </div>
-        
-
       </section>
+
+      {/*Paginação*/}
+      <nav className="flex items-center justify-center gap-6 text-4xl leading-none text-black">
+          <button 
+              type="button"
+              aria-label="Página anterior"
+              disabled={pagina === 1}
+              onClick={() => setPagina(pagina - 1)}
+              className="cursor-pointer disabled:cursor-blocked disabled:opacity-30"
+          >
+          <MdKeyboardArrowLeft size={60}/>
+          </button>
+          {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(
+              (numero) => (
+                  <button
+                      key={numero}
+                      type="button"
+                      onClick={() => setPagina(numero)}
+                      className={`w-10 h-10 rounded-full cursor-pointer
+                          ${pagina === numero? "font-bold text-black" : "text-black"} `}
+                  >
+                      {numero}
+                  </button>
+              )
+          )}
+        <button
+          type="button"
+          aria-label="Próxima página"
+          disabled={pagina === totalPaginas}
+          onClick={() => setPagina(pagina + 1)}
+          className="cursor-pointer disabled:cursor-default disabled:opacity-30"
+        >
+          <MdKeyboardArrowRight size={60}/>
+        </button>
+      </nav>
     </main>
   )
 }
