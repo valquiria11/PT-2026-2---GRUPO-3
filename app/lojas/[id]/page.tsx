@@ -317,7 +317,7 @@ function LojaConteudo(){
       {/*Melhor Avaliados*/}
       <section className="w-full px-[100px] my-10">
         <div className="flex items-baseline">
-          <h3 className="text-black text-5xl font-medium">Produtos</h3><p className="text-2xl m-2 text-black">melhor avaliados</p>
+          <h3 className="text-black text-5xl font-medium">Produtos</h3><p className="text-2xl m-1 text-black">melhor avaliados</p>
         </div>
 
         {melhoresAvaliados.length > 0 ? (
@@ -330,6 +330,23 @@ function LojaConteudo(){
           </div>
         ) : ( <p className="text-red-400 text-3xl">Produtos avaliados nesta loja.</p>
         )}
+
+      </section>
+
+      {/*Produtos da Loja*/}
+      <section className="w-full px-[100px] my-10">
+        <div className="flex items-baseline">
+          <h3 className="text-black text-5xl font-medium">Produtos</h3><p className="text-2xl m-1 text-black lowercase">de {loja.nome}</p>
+        </div>
+        <div className="grid sm:grid-cols-3 lg:grid-cols-5 gap-10">
+        {produtosdaLoja.map((produto) => (
+          <CartaoProduto
+            key={produto.id}
+            {...propsCartao(produto)}
+          />
+        ))}
+       </div>
+        
 
       </section>
     </main>
