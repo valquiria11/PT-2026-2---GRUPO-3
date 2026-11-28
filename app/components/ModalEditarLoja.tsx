@@ -40,8 +40,8 @@ export default function ModalEditarLoja({
   onLojaEditada,
   onLojaExcluida,
 }: ModalEditarLojaProps) {
-  const [nome, setNome] = useState(`${loja}`);
-  const [categoriaId, setCategoriaId] = useState("");
+  const [nome, setNome] = useState(`${loja.nome}`);
+  const [categoriaId, setCategoriaId] = useState(String(loja.categoria_id));
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [imagens, setImagens] = useState<Record<TipoImagem, File | null>>({
     sticker: null,
