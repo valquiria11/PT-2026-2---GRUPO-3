@@ -9,31 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@coreui/icons": "^3.1.0",
-    "@coreui/icons-react": "^2.3.0",
-    "@fontsource-variable/league-spartan": "^5.3.0",
-    "@healthicons/react": "^2.0.0",
-    "@heroicons/react": "^2.2.0",
-    "@hugeicons/core-free-icons": "^4.4.0",
-    "@hugeicons/react": "^1.1.10",
-    "@hugeicons/react-native": "^1.0.17",
-    "@iconify/react": "^6.0.4",
-    "axios": "^1.21.1",
-    "healthicons": "^3.1.0",
-    "lucide-react": "^1.75.0",
-    "next": "^16.4.6",
+    "next": "16.4.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "react-icons": "^5.7.0"
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.4",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "^16.4.6",
+    "eslint-config-next": "16.4.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
