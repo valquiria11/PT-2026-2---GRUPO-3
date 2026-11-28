@@ -10,7 +10,7 @@ import { useProducts } from "@/app/hooks/useProducts";
 import { imagemLoja, imagemProduto, type Produto } from "@/app/lib/products";
 import api from "@/app/services/api";
 import axios from "axios";
-import { Verified } from "lucide-react";
+import { LuPen } from "react-icons/lu";
 
 type Lojas = {
     id: number;
@@ -149,7 +149,8 @@ function LojaConteudo(){
     async function login() {
       try {
         const res = await axios.get<Usuario>("/api/session");
-        setUsuarioLogado(res.data);
+        console.log("Resposta completa:", res.data);
+        setUsuarioLogado(res.data)
       } catch {
         setUsuarioLogado(null);
       }
@@ -158,15 +159,10 @@ function LojaConteudo(){
   }, []);
 
   //identificação
-  const loja = lojas.find(
-    (item) => item.id === lojaId
-  );
-  const categoriaLoja = categorias.find(
-    (cat) => cat.id === loja?.categoria_id
-  );
-  const produtosdaLoja = produtos.filter(
-    (produto) => produto.loja?.id === lojaId
-  );
+  const loja = lojas.find((item) => item.id === lojaId);
+  const categoriaLoja = categorias.find((cat) => cat.id === loja?.categoria_id);
+  const produtosdaLoja = produtos.filter((produto) => produto.loja?.id === lojaId);
+  const donoDaLoja = usuarioLogado !== null && usuarioLogado.id === loja?.usuario_id;
   
 
   //validação
@@ -211,6 +207,10 @@ function LojaConteudo(){
       return mediaB - mediaA || notaB.total - notaA.total;
     })
     .slice(0, 6);
+
+console.log("Usuário logado:", usuarioLogado);
+console.log("ID do proprietário:", loja?.usuario_id);
+console.log("ID do usuário logado:", usuarioLogado?.id);
   
 
   return (
@@ -241,6 +241,24 @@ function LojaConteudo(){
                 <span className="text-2xl">{categoriaLoja?.nome}</span>
               </Link>
             </div>
+
+          {/*Botões modais*/}
+          {donoDaLoja &&  
+              <div className="absolute right-0 px-25 flex flex-col gap-3">
+                <button
+                  type="button"
+                  // onClick={() => setModalAberto(true)}
+                  className="rounded-full w-[45px] h-[45px] bg-[#6A38F3] flex justify-center items-center text-white text-6xl">
+                  <LuPen size={30}></LuPen>
+                </button>
+                <button
+                  type="button"
+                  // onClick={() => setModalAberto(true)}
+                  className="rounded-full w-[45px] h-[45px] bg-[#6A38F3] flex justify-center text-white text-6xl">
+                  <span>+</span>
+                </button>
+              </div>
+          }
 
             {/*Autor*/}
             <div className="absolute bottom-[35px] right-0 mx-25">
