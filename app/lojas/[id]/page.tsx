@@ -217,9 +217,6 @@ function LojaConteudo(){
     const totalPaginas = Math.ceil(produtosdaLoja.length / 15);
     const lojasPaginadas = produtosdaLoja.slice((pagina - 1) * 15, pagina * 15);
 
-    console.log("Modal aberto:", modalEditarAberto);
-  console.log("É dono da loja:", donoDaLoja);
-
   return (
     <main className="min-h-screen bg-[#F6F3E4]">
 
@@ -393,7 +390,7 @@ function LojaConteudo(){
           <MdKeyboardArrowRight size={60}/>
         </button>
       </nav>
-    {donoDaLoja && modalCriarAberto && (
+    {modalCriarAberto && (
     <ModalCriarProduto
       lojaId={loja.id}
       onClose={() => setModalCriarAberto(false)}
@@ -403,6 +400,25 @@ function LojaConteudo(){
       }}
       />
     )}
+     {modalEditarAberto && (
+      <ModalEditarLoja
+        loja={loja}
+        onFechar={() => setModalEditarAberto(false)}
+        onLojaEditada={(lojaAtualizada) => {
+          setLojas((lojasAtuais) =>
+            lojasAtuais.map((item) =>
+              item.id === lojaAtualizada.id
+              ? { ...item, ...lojaAtualizada }
+               : item
+              )
+             );
+          }}
+        onLojaExcluida={() => {
+          setModalEditarAberto(false);
+        }}
+        />
+      )}
+
   </main>
   )
 }
