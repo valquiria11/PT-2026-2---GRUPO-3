@@ -40,7 +40,7 @@ export default function ModalEditarLoja({
   onLojaEditada,
   onLojaExcluida,
 }: ModalEditarLojaProps) {
-  const [nome, setNome] = useState("");
+  const [nome, setNome] = useState(`${loja}`);
   const [categoriaId, setCategoriaId] = useState("");
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [imagens, setImagens] = useState<Record<TipoImagem, File | null>>({
@@ -272,7 +272,7 @@ export default function ModalEditarLoja({
   }
 
   const campo =
-    "w-full rounded-2xl border border-transparent bg-white px-3 py-3 text-sm text-[#252525] outline-none placeholder:text-gray-400 focus:border-[#6A38F3]";
+    "w-full rounded-3xl border border-transparent bg-white px-3 py-3 text-sm text-[#252525] outline-none placeholder:text-gray-400 focus:border-[#6A38F3]";
 
   function seletorImagem(tipo: TipoImagem, titulo: string) {
     return (
@@ -328,7 +328,47 @@ export default function ModalEditarLoja({
         <h2 className="mb-7 pt-2 text-center text-2xl font-bold text-[#252525]">
           Editar loja
         </h2>
+        {confirmarExclusao ? (
+          <div className="flex flex-col gap-5">
+            <p className="text-center text-base text-[#252525]">
+              Tem certeza que deseja excluir a loja
+              <strong> {loja.nome}</strong>?
+            </p>
 
+            <p className="text-center text-sm text-red-600">
+              Esta ação não poderá ser desfeita.
+            </p>
+
+            {erro && (
+              <p
+                role="alert"
+                className="text-center text-sm text-red-600"
+              >
+                {erro}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={excluirLoja}
+              disabled={excluindo}
+              className="w-full rounded-full bg-red-600 py-3 font-medium text-white hover:bg-red-700 disabled:opacity-50"
+            >
+              {excluindo
+                ? "Excluindo..."
+                : "Confirmar exclusão"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setConfirmarExclusao(false)}
+              disabled={excluindo}
+              className="w-full rounded-full border border-gray-400 bg-white py-3 font-medium text-[#252525] disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+          </div>
+        ) : (
         <form onSubmit={enviarFormulario} className="space-y-5">
           <input
             className={campo}
@@ -376,19 +416,30 @@ export default function ModalEditarLoja({
               {erro}
             </p>
           )}
-
-          <div className="pt-4">
+          <button
+              type="button"
+              onClick={() => {
+                setErro("");
+                setConfirmarExclusao(true);
+              }}
+              disabled={carregando}
+              className="w-full rounded-full border border-red-600 bg-red-600 py-3 font-medium text-white transition hover:bg-red-50 disabled:opacity-50"
+            >
+              DELETAR
+          </button>
+          <div className="pt-4 flex justify-center">
             <button
               type="submit"
               disabled={carregando || categorias.length === 0}
-              className="w-full rounded-full bg-[#6A38F3] py-3 text-white shadow-md transition hover:bg-[#5229D4] disabled:opacity-60"
+              className="w-[300px] h-[50px] rounded-full bg-[#6A38F3] py-3 text-white shadow-md transition hover:bg-[#5229D4] disabled:opacity-60"
             >
               {carregando
                 ? "Salvando..."
-                : "Salvar alterações"}
+                : "Salvar"}
             </button>
           </div>
         </form>
+        )}
       </section>
     </div>
   );
