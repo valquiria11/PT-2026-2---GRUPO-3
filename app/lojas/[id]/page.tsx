@@ -101,7 +101,6 @@ function LojaConteudo(){
 
   const [avaliacoesLojas, setAvaliacoesLojas] = useState<ResultadoAvaliacoes | null>(null);
   const [avaliacoesProd, setAvaliacoesProd] = useState<ResultadoAvaliacoes | null>(null);
-  const [melhorAvaliados, setMelhorAvaliados] = useState<[]>([]);
 
 
   //API
@@ -196,7 +195,9 @@ function LojaConteudo(){
       total: atual.total + 1,
     });
   }
+
   const melhoresAvaliados = [...produtosdaLoja]
+  .filter((produto) => notasPorProduto.has(produto.id))
   .sort((a, b) => {
       const notaA = notasPorProduto.get(a.id)!;
       const notaB = notasPorProduto.get(b.id)!;
@@ -207,11 +208,6 @@ function LojaConteudo(){
       return mediaB - mediaA || notaB.total - notaA.total;
     })
     .slice(0, 6);
-
-console.log("Usuário logado:", usuarioLogado);
-console.log("ID do proprietário:", loja?.usuario_id);
-console.log("ID do usuário logado:", usuarioLogado?.id);
-  
 
   return (
     <main className="min-h-screen bg-[#F6F3E4]">
@@ -318,13 +314,23 @@ console.log("ID do usuário logado:", usuarioLogado?.id);
         )}
       </section>
       
+      {/*Melhor Avaliados*/}
       <section className="w-full px-[100px] my-10">
         <div className="flex items-baseline">
           <h3 className="text-black text-5xl font-medium">Produtos</h3><p className="text-2xl m-2 text-black">melhor avaliados</p>
         </div>
-        <div>
 
-        </div>
+        {melhoresAvaliados.length > 0 ? (
+          <div className="flex gap-6 overflow-x-auto py-5">
+            {melhoresAvaliados.map((produto) => (
+              <div key={produto.id}>
+                <CartaoProduto {...propsCartao(produto)}/>
+              </div>
+            ))}
+          </div>
+        ) : ( <p className="text-red-400 text-3xl">Produtos avaliados nesta loja.</p>
+        )}
+
       </section>
     </main>
   )
