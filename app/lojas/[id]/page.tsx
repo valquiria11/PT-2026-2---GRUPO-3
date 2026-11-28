@@ -12,6 +12,8 @@ import api from "@/app/services/api";
 import axios from "axios";
 import { LuPen } from "react-icons/lu";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import ModalEditarLoja from "@/app/components/ModalEditarLoja";
+import ModalCriarProduto from "@/app/components/ModalCriarProduto"; 
 
 type Lojas = {
     id: number;
@@ -103,7 +105,8 @@ function LojaConteudo(){
   const [avaliacoesLojas, setAvaliacoesLojas] = useState<ResultadoAvaliacoes | null>(null);
   const [avaliacoesProd, setAvaliacoesProd] = useState<ResultadoAvaliacoes | null>(null);
   const [pagina, setPagina] = useState(1);
-
+  const [modalEditarAberto, setModalEditarAberto] = useState(false);
+  const [modalCriarAberto, setModalCriarAberto] = useState(false);
 
   //API
   useEffect(() => {
@@ -150,7 +153,6 @@ function LojaConteudo(){
     async function login() {
       try {
         const res = await axios.get<Usuario>("/api/session");
-        console.log("Resposta completa:", res.data);
         setUsuarioLogado(res.data)
       } catch {
         setUsuarioLogado(null);
@@ -215,6 +217,9 @@ function LojaConteudo(){
     const totalPaginas = Math.ceil(produtosdaLoja.length / 15);
     const lojasPaginadas = produtosdaLoja.slice((pagina - 1) * 15, pagina * 15);
 
+    console.log("Modal aberto:", modalEditarAberto);
+  console.log("É dono da loja:", donoDaLoja);
+
   return (
     <main className="min-h-screen bg-[#F6F3E4]">
 
@@ -245,22 +250,22 @@ function LojaConteudo(){
             </div>
 
           {/*Botões modais*/}
-          {donoDaLoja &&  
-              <div className="absolute right-0 px-25 flex flex-col gap-3">
+          {donoDaLoja && (
+              <div className="absolute right-0 py-10 px-25 flex flex-col gap-4">
                 <button
                   type="button"
-                  // onClick={() => setModalAberto(true)}
-                  className="rounded-full w-[45px] h-[45px] bg-[#6A38F3] flex justify-center items-center text-white text-6xl">
+                   onClick={() => {setModalEditarAberto(true)}}
+                  className="rounded-full hover:opacity-80 w-[45px] h-[45px] bg-[#6A38F3] flex justify-center items-center text-white text-6xl">
                   <LuPen size={30}></LuPen>
                 </button>
                 <button
                   type="button"
-                  // onClick={() => setModalAberto(true)}
-                  className="rounded-full w-[45px] h-[45px] bg-[#6A38F3] flex justify-center text-white text-6xl">
+                   onClick={() => setModalCriarAberto(true)}
+                  className="rounded-full hover:opacity-80  w-[45px] h-[45px] bg-[#6A38F3] flex justify-center text-white text-6xl">
                   <span>+</span>
                 </button>
               </div>
-          }
+          )}
 
             {/*Autor*/}
             <div className="absolute bottom-[35px] right-0 mx-25">
@@ -334,7 +339,7 @@ function LojaConteudo(){
               </div>
             ))}
           </div>
-        ) : ( <p className="text-red-400 text-3xl">Produtos avaliados nesta loja.</p>
+        ) : ( <p className="text-red-400 text-2xl py-5">Esta loja não possui produtos avaliados.</p>
         )}
 
       </section>
@@ -388,6 +393,16 @@ function LojaConteudo(){
           <MdKeyboardArrowRight size={60}/>
         </button>
       </nav>
-    </main>
+    {donoDaLoja && modalCriarAberto && (
+    <ModalCriarProduto
+      lojaId={loja.id}
+      onClose={() => setModalCriarAberto(false)}
+      onCreated={(produtoId) => {
+        console.log("Produto criado:", produtoId);
+        setModalCriarAberto(false);
+      }}
+      />
+    )}
+  </main>
   )
 }
