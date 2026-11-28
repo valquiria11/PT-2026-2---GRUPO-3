@@ -314,7 +314,7 @@ export default function ModalEditarLoja({
       }}
     >
       
-      <section className="relative max-h-[95vh] w-full max-w-[523px] overflow-y-auto bg-[#EEEEEE] px-8 py-8 sm:px-14">
+      <section className="relative rounded-2xl max-h-[95vh] w-full max-w-[523px] overflow-y-auto bg-[#EEEEEE] px-8 py-8 sm:px-14">
         <button
           type="button"
           onClick={onFechar}
