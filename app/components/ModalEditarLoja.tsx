@@ -310,14 +310,15 @@ export default function ModalEditarLoja({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget && !carregando) onFechar();
+        if (event.target === event.currentTarget && !carregando && !excluindo) onFechar();
       }}
     >
+      
       <section className="relative max-h-[95vh] w-full max-w-[523px] overflow-y-auto bg-[#EEEEEE] px-8 py-8 sm:px-14">
         <button
           type="button"
           onClick={onFechar}
-          disabled={carregando}
+          disabled={carregando || excluindo}
           aria-label="Fechar modal"
           className="absolute right-6 top-5 text-4xl leading-none text-black hover:opacity-60 disabled:opacity-40"
         >
@@ -325,7 +326,7 @@ export default function ModalEditarLoja({
         </button>
 
         <h2 className="mb-7 pt-2 text-center text-2xl font-bold text-[#252525]">
-          Criar loja
+          Editar loja
         </h2>
 
         <form onSubmit={enviarFormulario} className="space-y-5">
@@ -336,7 +337,7 @@ export default function ModalEditarLoja({
             onChange={(event) => setNome(event.target.value)}
             maxLength={100}
             required
-            disabled={!!lojaCriada || carregando}
+            disabled={excluindo || carregando}
           />
 
           <select
@@ -344,7 +345,7 @@ export default function ModalEditarLoja({
             value={categoriaId}
             onChange={(event) => setCategoriaId(event.target.value)}
             required
-            disabled={!!lojaCriada || carregando}
+            disabled={excluindo || carregando}
           >
             <option value="">Selecione uma categoria</option>
             {categorias.map((categoria) => (
@@ -370,12 +371,6 @@ export default function ModalEditarLoja({
             </p>
           </div>
 
-          {lojaCriada && (
-            <p className="text-center text-sm text-amber-700">
-              Loja criada. Falta concluir o envio das imagens.
-            </p>
-          )}
-
           {erro && (
             <p role="alert" className="text-center text-sm text-red-600">
               {erro}
@@ -390,9 +385,7 @@ export default function ModalEditarLoja({
             >
               {carregando
                 ? "Salvando..."
-                : lojaCriada
-                  ? "Tentar enviar imagens"
-                  : "Adicionar loja"}
+                : "Salvar alterações"}
             </button>
           </div>
         </form>
